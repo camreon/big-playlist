@@ -27,7 +27,6 @@ const App: React.FC = () => {
     streamUrl, 
     currentIndex, 
     tracks, 
-    loading 
   } = useSelector((state: RootState) => state.playlist);
   
   const { error } = useSelector((state: RootState) => state.feedback);
@@ -102,8 +101,6 @@ const App: React.FC = () => {
           <div className="space-y-6">
             <Playlist 
               playlistId={playlistId}
-              loading={loading}
-              currentIndex={currentIndex}
               tracks={tracks} 
               playTrack={handlePlayTrack}
               deleteTrack={handleDeleteTrack}

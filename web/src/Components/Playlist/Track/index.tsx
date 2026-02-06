@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrackComponentProps } from '../../../interfaces';
 import './Track.css';
+import { PauseIcon, PlayIcon } from '../../Common/Icons';
 
 export const Track: React.FC<TrackComponentProps> = ({
   isLoading,
@@ -15,20 +16,19 @@ export const Track: React.FC<TrackComponentProps> = ({
       onClick={handleOnClick}
       className={`group relative px-6 py-4 hover:bg-gray-50/50 cursor-pointer transition-all duration-200 track-item 
         ${isPlaying ? 'playing' : ''}
-        ${isLoading ? 'opacity-50 pointer-events-none' : ''}
+        ${isLoading && isPlaying ? 'opacity-50 pointer-events-none' : ''}
       `}
     >
       <div className="flex items-center space-x-4">
         <div className="flex-shrink-0">
           {isPlaying ? (
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-              </svg>
+            <div className="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center">
+              <PauseIcon />
             </div>
           ) : (
-            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 group-hover:bg-gray-200 transition-colors duration-200 track-number">
-              {index + 1}
+            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 group-hover:bg-amber-700 transition-colors duration-200 track-number">
+              <span className="group-hover:hidden">{index + 1}</span>
+              <span className="hidden group-hover:block"><PlayIcon /></span>
             </div>
           )}
         </div>

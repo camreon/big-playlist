@@ -12,8 +12,9 @@ export interface PlaylistState {
   streamUrl: string;
   currentIndex: number;
   tracks: TrackProps[];
-  loading: boolean;
-  trackLoading: boolean;
+  playlistLoading: boolean;
+  fetchTrackLoading: boolean;
+  addTrackLoading: boolean;
 }
 
 export interface MenuProps {
@@ -29,8 +30,6 @@ export interface PlayerProps extends TrackProps {
 
 export interface PlaylistProps {
   playlistId: string;
-  loading: boolean;
-  currentIndex: number;
   tracks: TrackProps[];
   playTrack: (track_index: number) => void;
   deleteTrack: (track_id: number) => void;

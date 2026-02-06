@@ -74,7 +74,7 @@ class StreamService(GenericStreamService):
             try:
                 info = ydl.extract_info(url, download=False)
             except utils.YoutubeDLError as e:
-                raise
+                raise(e)
 
         if 'entries' in info:
             tracks = info['entries']

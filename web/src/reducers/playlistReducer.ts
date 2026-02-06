@@ -14,8 +14,9 @@ const initialState: PlaylistState = {
   streamUrl: '',
   currentIndex: -1,
   tracks: [],
-  loading: false,
-  trackLoading: false
+  playlistLoading: false,
+  fetchTrackLoading: false,
+  addTrackLoading: false
 };
 
 const playlistSlice = createSlice({
@@ -47,39 +48,43 @@ const playlistSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(FETCH_PLAYLIST.pending, (state) => {
-        state.loading = true;
+        state.playlistLoading = true;
       })
       .addCase(FETCH_PLAYLIST.fulfilled, (state, action) => {
         state.tracks = action.payload;
-        state.loading = false;
+        state.playlistLoading = false;
       })
       .addCase(FETCH_PLAYLIST.rejected, (state) => {
-        state.loading = false;
+        state.playlistLoading = false;
       })
+
       .addCase(FETCH_TRACK.pending, (state) => {
-        state.trackLoading = true;
+        state.fetchTrackLoading = true;
       })
       .addCase(FETCH_TRACK.fulfilled, (state, action) => {
         state.streamUrl = action.payload.stream_url;
-        state.trackLoading = false;
+        state.fetchTrackLoading = false;
       })
       .addCase(FETCH_TRACK.rejected, (state) => {
-        state.trackLoading = false;
+        state.fetchTrackLoading = false;
       })
+
       .addCase(ADD_TRACK.pending, (state) => {
-        state.trackLoading = true;
+        state.addTrackLoading = true;
       })
       .addCase(ADD_TRACK.fulfilled, (state, action) => {
         state.tracks = [...state.tracks, ...action.payload];
-        state.trackLoading = false;
+        state.addTrackLoading = false;
       })
       .addCase(ADD_TRACK.rejected, (state) => {
-        state.trackLoading = false;
+        state.addTrackLoading = false;
       })
+
       .addCase(DELETE_TRACK.fulfilled, (state, action) => {
         const { trackId } = action.payload;
         state.tracks = state.tracks.filter((track) => track.id !== trackId);
       })
+
       .addCase(FETCH_NEXT_PLAYLIST_ID.fulfilled, (state, action) => {
         state.nextPlaylistId = action.payload;
       });

@@ -6,7 +6,7 @@ const API_URL = `${BASE_URL}/api`;
 async function assertOk(response: Response) {
   if (!response.ok) {
     const errors = await response.json();
-    throw new Error(errors.errors);
+    throw new Error(errors.message);
   }
 }
 

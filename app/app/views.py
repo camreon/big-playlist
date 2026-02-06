@@ -70,6 +70,7 @@ def add(stream_service: StreamService, id=1):
     added_tracks = []
 
     for t in tracks:
+        print('Adding new track: ', json.dumps(t, indent=4, sort_keys=True))
         new_track = Track(
             title=t.get('title'),
             artist=t.get('artist'),
@@ -103,6 +104,7 @@ def delete(id=None, track_id=None):
 def custom400(error):
     log.error(error)
 
+    print('CUSTOM 400 ERROR: ', error)
     #TODO: want both the youtube-dl error and url here
 
     json_exception = JsonException(error.description.args[0])

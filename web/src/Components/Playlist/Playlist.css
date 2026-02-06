@@ -119,11 +119,3 @@
 .playlist-container {
   scroll-behavior: smooth;
 }
-
-/* Glass morphism effect for cards */
-.playlist-container .glass-card {
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
