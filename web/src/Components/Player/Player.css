@@ -1,25 +1,41 @@
-.player-container audio::-webkit-media-controls-current-time-display,
-.player-container audio::-webkit-media-controls-time-remaining-display {
+/* ABOUTME: Styles for the bottom fixed player bar.
+   ABOUTME: Targets control group, audio element, nav buttons, and now-playing pill. */
+.player-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.player-audio {
+  max-width: 100%;
+}
+
+.player-container .player-audio::-webkit-media-controls-current-time-display,
+.player-container .player-audio::-webkit-media-controls-time-remaining-display {
   color: #374151;
   font-weight: 600;
   font-size: 0.875rem;
 }
 
-.player-container button {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+.player-container .player-audio::-webkit-media-controls-panel {
+  background: #e5e7eb;
+  border-radius: 9999px;
+  padding: 6px 12px;
+}
+
+.player-container .player-audio::-webkit-media-controls-play-button:hover {
+  transform: scale(1.05);
+}
+
+.player-container .player-nav-btn {
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
   cursor: pointer;
 }
 
-.player-container button:hover {
-  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+.player-container .player-nav-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.player-container audio::-webkit-media-controls-panel {
-  background: #e2e8f0;
-  border-radius: 12px;
-  padding: 8px 12px;
-}
-
-.player-container audio::-webkit-media-controls-play-button:hover {
-  transform: scale(1.05);
+.player-now-playing {
+  min-width: 0;
 }

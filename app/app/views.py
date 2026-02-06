@@ -70,7 +70,7 @@ def add(stream_service: StreamService, id=1):
     added_tracks = []
 
     for t in tracks:
-        print('Adding new track: ', json.dumps(t, indent=4, sort_keys=True))
+        # print('Adding new track: ', json.dumps(t, indent=4, sort_keys=True))
         new_track = Track(
             title=t.get('title'),
             artist=t.get('artist'),
