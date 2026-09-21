@@ -14,10 +14,19 @@ const initialState: PlaylistState = {
   streamUrl: '',
   currentIndex: -1,
   tracks: [],
+  pendingTrackUrls: [],
   playlistLoading: false,
   fetchTrackLoading: false,
   addTrackLoading: false
 };
+
+function removePendingUrl(state: PlaylistState, pageUrl: string) {
+  const index = state.pendingTrackUrls.indexOf(pageUrl);
+
+  if (index !== -1) {
+    state.pendingTrackUrls.splice(index, 1);
+  }
+}
 
 const playlistSlice = createSlice({
   name: 'playlist',
@@ -69,14 +78,17 @@ const playlistSlice = createSlice({
         state.fetchTrackLoading = false;
       })
 
-      .addCase(ADD_TRACK.pending, (state) => {
+      .addCase(ADD_TRACK.pending, (state, action) => {
+        state.pendingTrackUrls.push(action.meta.arg.pageUrl);
         state.addTrackLoading = true;
       })
       .addCase(ADD_TRACK.fulfilled, (state, action) => {
+        removePendingUrl(state, action.meta.arg.pageUrl);
         state.tracks = [...state.tracks, ...action.payload];
         state.addTrackLoading = false;
       })
-      .addCase(ADD_TRACK.rejected, (state) => {
+      .addCase(ADD_TRACK.rejected, (state, action) => {
+        removePendingUrl(state, action.meta.arg.pageUrl);
         state.addTrackLoading = false;
       })
 

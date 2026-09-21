@@ -12,6 +12,7 @@ export interface PlaylistState {
   streamUrl: string;
   currentIndex: number;
   tracks: TrackProps[];
+  pendingTrackUrls: string[];
   playlistLoading: boolean;
   fetchTrackLoading: boolean;
   addTrackLoading: boolean;
@@ -42,6 +43,10 @@ export interface TrackComponentProps {
   track: TrackProps;
   handleOnClick: () => void;
   handleOnDelete: () => void;
+}
+
+export interface PendingTrackProps {
+  pageUrl: string;
 }
 
 export interface ConfirmationDialogProps {
