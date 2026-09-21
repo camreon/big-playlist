@@ -123,7 +123,7 @@ class ViewsTest(TestCase):
         ]
 
         with mock.patch(
-            'umq.stream_service.MockStreamService.extract_info',
+            'app.stream_service.MockStreamService.extract_info',
             side_effect=Exception('test error message')
         ):
             for url in invalid_urls:
