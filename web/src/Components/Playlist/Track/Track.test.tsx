@@ -24,8 +24,8 @@ function renderTrack(overrides = {}) {
     handleOnDelete: vi.fn(),
     ...overrides
   };
-  render(<Track {...props} />);
-  return props;
+  const { container } = render(<Track {...props} />);
+  return { ...props, container };
 }
 
 test('gives both row actions a touch-sized hit area', () => {
@@ -55,4 +55,56 @@ test('opening the source does not also start playing the track', async () => {
   await userEvent.click(screen.getByTitle('Open source'));
 
   expect(props.handleOnClick).not.toHaveBeenCalled();
+});
+
+test('keeps the inline actions for wide screens only', () => {
+  const { container } = renderTrack();
+
+  const inline = container.querySelector('.inline-actions');
+
+  expect(inline).toHaveClass('hidden', 'md:flex');
+});
+
+test('offers a narrow screen menu holding the same actions', async () => {
+  renderTrack();
+
+  const menuButton = screen.getByRole('button', { name: 'Track actions' });
+
+  expect(menuButton.parentElement).toHaveClass('md:hidden');
+  expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+
+  await userEvent.click(menuButton);
+
+  expect(screen.getByRole('menuitem', { name: 'Open source' })).toBeInTheDocument();
+  expect(screen.getByRole('menuitem', { name: 'Delete' })).toBeInTheDocument();
+});
+
+test('opening the menu does not start playing the track', async () => {
+  const props = renderTrack();
+
+  await userEvent.click(screen.getByRole('button', { name: 'Track actions' }));
+
+  expect(props.handleOnClick).not.toHaveBeenCalled();
+});
+
+test('deleting from the menu closes it without starting playback', async () => {
+  const props = renderTrack();
+
+  await userEvent.click(screen.getByRole('button', { name: 'Track actions' }));
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Delete' }));
+
+  expect(props.handleOnDelete).toHaveBeenCalledOnce();
+  expect(props.handleOnClick).not.toHaveBeenCalled();
+  expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+});
+
+test('closes the menu when clicking elsewhere', async () => {
+  renderTrack();
+
+  await userEvent.click(screen.getByRole('button', { name: 'Track actions' }));
+  expect(screen.getByRole('menu')).toBeInTheDocument();
+
+  await userEvent.click(document.body);
+
+  expect(screen.queryByRole('menu')).not.toBeInTheDocument();
 });

@@ -34,7 +34,8 @@
   opacity: 1;
 }
 
-.action-button {
+.action-button,
+.track-menu-button {
   display: flex;
   align-items: center;
   justify-content: center;
