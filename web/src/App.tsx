@@ -38,6 +38,14 @@ const App: React.FC = () => {
     dispatch(FETCH_NEXT_PLAYLIST_ID());
   }, [dispatch, id]);
 
+  const currentTrackId = tracks[currentIndex]?.id;
+
+  useEffect(() => {
+    if (currentTrackId === undefined) return;
+
+    dispatch(FETCH_TRACK({ playlistId, trackId: currentTrackId }));
+  }, [dispatch, playlistId, currentTrackId]);
+
   const handleAddTrack = (pageUrl: string) => {
     dispatch(ADD_TRACK({ playlistId, pageUrl }));
   };
@@ -46,8 +54,6 @@ const App: React.FC = () => {
     if (trackIndex === currentIndex) return;
 
     dispatch(setCurrentIndex(trackIndex));
-    const track = tracks[trackIndex];
-    dispatch(FETCH_TRACK({ playlistId, trackId: track.id }));
   };
 
   const handleDeleteTrack = (trackId: number) => {
@@ -55,21 +61,11 @@ const App: React.FC = () => {
   };
 
   const handleNextTrack = () => {
-    dispatch(nextTrack());
-    if (tracks.length > 0) {
-      const nextIndex = (currentIndex + 1) % tracks.length;
-      const track = tracks[nextIndex];
-      dispatch(FETCH_TRACK({ playlistId, trackId: track.id }));
-    }
+    dispatch(nextTrack(Math.random()));
   };
 
   const handlePrevTrack = () => {
     dispatch(prevTrack());
-    if (tracks.length > 0) {
-      const prevIndex = currentIndex > 0 ? currentIndex - 1 : tracks.length - 1;
-      const track = tracks[prevIndex];
-      dispatch(FETCH_TRACK({ playlistId, trackId: track.id }));
-    }
   };
 
   const currentTrack = tracks[currentIndex] || null;

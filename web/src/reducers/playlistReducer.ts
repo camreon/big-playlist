@@ -15,6 +15,8 @@ const initialState: PlaylistState = {
   currentIndex: -1,
   tracks: [],
   pendingTrackUrls: [],
+  shuffle: false,
+  repeat: false,
   playlistLoading: false,
   fetchTrackLoading: false,
   addTrackLoading: false
@@ -41,10 +43,28 @@ const playlistSlice = createSlice({
     setStreamUrl: (state, action: PayloadAction<string>) => {
       state.streamUrl = action.payload;
     },
-    nextTrack: (state) => {
-      if (state.tracks.length > 0) {
-        state.currentIndex = (state.currentIndex + 1) % state.tracks.length;
+    toggleShuffle: (state) => {
+      state.shuffle = !state.shuffle;
+    },
+    toggleRepeat: (state) => {
+      state.repeat = !state.repeat;
+    },
+    nextTrack: (state, action: PayloadAction<number | undefined>) => {
+      if (state.tracks.length === 0) {
+        return;
       }
+
+      if (state.shuffle && state.tracks.length > 1) {
+        // Offsetting from the next track keeps shuffle off the one already playing.
+        const roll = action.payload ?? 0;
+        const others = state.tracks.length - 1;
+        const offset = Math.min(Math.floor(roll * others), others - 1);
+
+        state.currentIndex = (state.currentIndex + 1 + offset) % state.tracks.length;
+        return;
+      }
+
+      state.currentIndex = (state.currentIndex + 1) % state.tracks.length;
     },
     prevTrack: (state) => {
       if (state.tracks.length > 0) {
@@ -108,7 +128,9 @@ export const {
   setCurrentIndex, 
   setStreamUrl, 
   nextTrack, 
-  prevTrack 
+  prevTrack,
+  toggleShuffle,
+  toggleRepeat
 } = playlistSlice.actions;
 
 export default playlistSlice.reducer; 

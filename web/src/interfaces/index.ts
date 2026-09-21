@@ -13,6 +13,8 @@ export interface PlaylistState {
   currentIndex: number;
   tracks: TrackProps[];
   pendingTrackUrls: string[];
+  shuffle: boolean;
+  repeat: boolean;
   playlistLoading: boolean;
   fetchTrackLoading: boolean;
   addTrackLoading: boolean;
