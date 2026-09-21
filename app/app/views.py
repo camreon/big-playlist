@@ -1,7 +1,7 @@
 from flask import (
     abort, Blueprint, flash, jsonify, request, render_template, redirect
 )
-from app.db import Track, Playlist
+from app.db import db, Track, Playlist
 from app.log import log
 from app.errors import JsonException
 from app.stream_service import StreamService
@@ -12,17 +12,27 @@ bp = Blueprint("index", __name__, url_prefix='/api')
 
 @bp.route('/<int:id>/<int:track_id>')
 def get_track_info(id, track_id, stream_service: StreamService):
-    """Update track info from youtube-dl every time db is queried """
+    """Return a track, re-resolving its stream URL only once the stored one has expired."""
 
     track = Track.get(track_id)
+
+    if track.stream_url_is_fresh():
+        return jsonify(track.to_json())
 
     try:
         tracks = stream_service.extract_info(track.page_url)
     except Exception as error:
         abort(400, error)
 
-    track = Track.from_dict(tracks[0])
-    track.id = track_id
+    resolved = tracks[0]
+
+    track.title = resolved.get('title')
+    track.artist = resolved.get('artist')
+    track.set_stream_url(resolved.get('url', track.page_url))
+
+    db.session.commit()
+
+    log.info('REFRESHED stream url for track {0}'.format(track.id))
 
     return jsonify(track.to_json())
 

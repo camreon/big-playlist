@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta
 from flask_testing import TestCase
 from unittest import mock
 from app.app import create_app
@@ -189,6 +190,66 @@ class ViewsTest(TestCase):
 
         self.assertIsNotNone(res.json)
         self.assertEqual(res.json['page_url'], url)
+
+    def test_stored_stream_url_is_served_without_re_extracting(self):
+
+        url = 'https://www.youtube.com/watch?v=c5OS0nALlfQ'
+        track_id = self.add_track(url)
+        stored = Track.get(track_id).stream_url
+
+        with mock.patch(
+            'app.stream_service.MockStreamService.extract_info'
+        ) as extract_info:
+            res = self.client.get('{}{}/{}'.format(self.API_URL, self.PLAYLIST_ID, track_id))
+
+        self.assert200(res)
+        extract_info.assert_not_called()
+        self.assertEqual(stored, res.json['stream_url'])
+
+    def test_expired_stream_url_is_re_extracted(self):
+
+        url = 'https://www.youtube.com/watch?v=c5OS0nALlfQ'
+        track_id = self.add_track(url)
+
+        track = Track.get(track_id)
+        track.stream_url_expires_at = datetime.utcnow() - timedelta(minutes=1)
+        db.session.commit()
+
+        with mock.patch(
+            'app.stream_service.MockStreamService.extract_info',
+            return_value=[dict(title='refreshed', artist='a', webpage_url=url, url=url + '-fresh')]
+        ) as extract_info:
+            res = self.client.get('{}{}/{}'.format(self.API_URL, self.PLAYLIST_ID, track_id))
+
+        self.assert200(res)
+        extract_info.assert_called_once()
+        self.assertEqual(url + '-fresh', res.json['stream_url'])
+
+    def test_re_extracted_stream_url_is_stored_for_next_time(self):
+
+        url = 'https://www.youtube.com/watch?v=c5OS0nALlfQ'
+        track_id = self.add_track(url)
+
+        track = Track.get(track_id)
+        track.stream_url_expires_at = datetime.utcnow() - timedelta(minutes=1)
+        db.session.commit()
+
+        with mock.patch(
+            'app.stream_service.MockStreamService.extract_info',
+            return_value=[dict(title='refreshed', artist='a', webpage_url=url, url=url + '-fresh')]
+        ):
+            self.client.get('{}{}/{}'.format(self.API_URL, self.PLAYLIST_ID, track_id))
+
+        refreshed = Track.get(track_id)
+
+        self.assertEqual(url + '-fresh', refreshed.stream_url)
+        self.assertGreater(refreshed.stream_url_expires_at, datetime.utcnow())
+
+    def test_adding_a_track_records_when_its_stream_url_expires(self):
+
+        track_id = self.add_track('https://www.youtube.com/watch?v=c5OS0nALlfQ')
+
+        self.assertGreater(Track.get(track_id).stream_url_expires_at, datetime.utcnow())
 
     def test_get_missing_track(self):
         
