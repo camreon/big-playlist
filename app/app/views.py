@@ -55,6 +55,10 @@ def add(stream_service: StreamService, id=1):
     """Get track info from a URL and add it to the playlist."""
 
     data = request.get_json()
+
+    if not isinstance(data, dict) or not (data.get('page_url') or '').strip():
+        abort(400, 'A page_url is required.')
+
     url = data['page_url'].strip()
 
     try:
@@ -104,10 +108,15 @@ def delete(id=None, track_id=None):
 def custom400(error):
     log.error(error)
 
-    print('CUSTOM 400 ERROR: ', error)
     #TODO: want both the youtube-dl error and url here
+    description = error.description
 
-    json_exception = JsonException(error.description.args[0])
+    if isinstance(description, Exception) and description.args:
+        message = description.args[0]
+    else:
+        message = str(description)
+
+    json_exception = JsonException(message)
 
     response = jsonify(json_exception.to_dict())
     response.status_code = json_exception.status_code

@@ -133,6 +133,29 @@ class ViewsTest(TestCase):
                 self.assert400(res)
                 self.assertEqual('test error message', res.json['message'])
 
+    def test_add_track_without_page_url(self):
+
+        data = json.dumps(dict())
+        res = self.client.post(self.API_URL, data=data, content_type='application/json')
+
+        self.assert400(res)
+        self.assertIn('page_url', res.json['message'])
+
+    def test_add_track_with_blank_page_url(self):
+
+        data = json.dumps(dict(page_url='   '))
+        res = self.client.post(self.API_URL, data=data, content_type='application/json')
+
+        self.assert400(res)
+        self.assertIn('page_url', res.json['message'])
+
+    def test_add_track_with_malformed_json(self):
+
+        res = self.client.post(self.API_URL, data='{not json', content_type='application/json')
+
+        self.assert400(res)
+        self.assertTrue(res.json['message'])
+
     def test_get_tracks(self):
 
         # add tracks
