@@ -6,6 +6,9 @@ import './index.css';
 import './tailwind.css';
 import App from './App';
 import { store } from './store';
+import { initErrorReporting } from './errorReporting';
+
+initErrorReporting(import.meta.env.VITE_SENTRY_DSN, import.meta.env.MODE);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
