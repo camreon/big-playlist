@@ -6,6 +6,9 @@ import './index.css';
 import './tailwind.css';
 import App from './App';
 import { store } from './store';
+import { initErrorReporting } from './errorReporting';
+
+initErrorReporting(import.meta.env.VITE_SENTRY_DSN, import.meta.env.MODE);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -14,7 +17,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/:id" element={<App />} />

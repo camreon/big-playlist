@@ -3,6 +3,7 @@ import { PlaylistProps } from '../../interfaces';
 import './Playlist.css';
 import ConfirmationDialog from '../Common/ConfirmationDialog';
 import { Track } from './Track';
+import { PendingTrack } from './Track/PendingTrack';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { MusicNoteIcon } from '../Common/Icons';
@@ -13,7 +14,7 @@ const Playlist = ({
   playTrack, 
   deleteTrack 
 }: PlaylistProps) => {
-  const { playlistLoading, fetchTrackLoading, currentIndex } = useSelector((state: RootState) => state.playlist);
+  const { playlistLoading, fetchTrackLoading, currentIndex, pendingTrackUrls } = useSelector((state: RootState) => state.playlist);
   const [trackToDelete, setTrackToDelete] = useState<{ id: number; title: string } | null>(null);
 
   const handleDeleteClick = (track: { id: number; title: string }) => {
@@ -42,7 +43,7 @@ const Playlist = ({
     );
   }
 
-  if (!tracks.length) {
+  if (!tracks.length && !pendingTrackUrls.length) {
     return (
       <div className="bg-white/60 backdrop-blur-sm rounded-2xl shadow-sm border border-white/20 overflow-hidden empty-state">
         <div className="px-6 py-4 border-b border-gray-100">
@@ -78,6 +79,9 @@ const Playlist = ({
             track={track}
             index={index}
           />
+        ))}
+        {pendingTrackUrls.map((pageUrl, index) => (
+          <PendingTrack key={`${pageUrl}-${index}`} pageUrl={pageUrl} />
         ))}
       </div>
       

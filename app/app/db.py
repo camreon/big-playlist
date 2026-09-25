@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.log import log
+from app.stream_url import expires_at
 
 
 db = SQLAlchemy()
@@ -45,13 +48,28 @@ class Track(db.Model):
     title = db.Column(db.String())
     artist = db.Column(db.String())
     page_url = db.Column(db.String())
+    stream_url_expires_at = db.Column(db.DateTime())
 
     def __init__(self, stream_url, title, artist, page_url, playlist_id):
-        self.stream_url = stream_url
         self.title = title
         self.artist = artist
         self.page_url = page_url
         self.playlist_id = playlist_id
+        self.set_stream_url(stream_url)
+
+    def set_stream_url(self, url):
+        """Store a freshly resolved stream URL alongside when it stops being usable."""
+
+        self.stream_url = url
+        self.stream_url_expires_at = expires_at(url, datetime.utcnow())
+
+    def stream_url_is_fresh(self):
+        """Whether the stored stream URL can still be handed to a player."""
+
+        if not self.stream_url or not self.stream_url_expires_at:
+            return False
+
+        return self.stream_url_expires_at > datetime.utcnow()
 
     def __repr__(self):
         return '{}'.format(self.id)

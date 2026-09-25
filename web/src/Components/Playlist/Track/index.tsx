@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { TrackComponentProps } from '../../../interfaces';
 import './Track.css';
 import { PauseIcon, PlayIcon } from '../../Common/Icons';
@@ -11,6 +11,23 @@ export const Track: React.FC<TrackComponentProps> = ({
   track,
   index
 }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const closeOnClickAway = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', closeOnClickAway);
+
+    return () => document.removeEventListener('mousedown', closeOnClickAway);
+  }, [menuOpen]);
+
   return (
     <div 
       onClick={handleOnClick}
@@ -46,7 +63,7 @@ export const Track: React.FC<TrackComponentProps> = ({
               )}
             </div>
             
-            <div className="flex items-center space-x-3 ml-4">
+            <div className="inline-actions hidden md:flex items-center space-x-3 ml-4">
               <a 
                 href={track.page_url} 
                 target="_blank" 
@@ -55,7 +72,7 @@ export const Track: React.FC<TrackComponentProps> = ({
                 title="Open source"
                 onClick={(e) => e.stopPropagation()}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </a>
@@ -68,10 +85,59 @@ export const Track: React.FC<TrackComponentProps> = ({
                 className="text-gray-400 hover:text-red-600 transition-colors duration-200 action-button delete-button cursor-pointer"
                 title={`Delete ${track.title}`}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
               </button>
+            </div>
+
+            <div className="relative md:hidden ml-4" ref={menuRef}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMenuOpen((open) => !open);
+                }}
+                className="text-gray-400 track-menu-button cursor-pointer"
+                aria-label="Track actions"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+
+              {menuOpen && (
+                <div
+                  role="menu"
+                  className="absolute right-0 top-full z-10 w-40 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden"
+                >
+                  <a
+                    role="menuitem"
+                    href={track.page_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuOpen(false);
+                    }}
+                  >
+                    Open source
+                  </a>
+                  <button
+                    role="menuitem"
+                    className="block w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuOpen(false);
+                      handleOnDelete();
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
